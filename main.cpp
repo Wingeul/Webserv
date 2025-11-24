@@ -4,8 +4,9 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include "structure.hpp"
 
-int main() {
+/*int main() {
     int server_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (server_fd < 0) {
         std::cerr << "Error: cannot create socket\n";
@@ -58,4 +59,10 @@ int main() {
 
     close(server_fd);
     return 0;
+}*/
+
+int main ()
+{
+    main_loop();
+    return (0);
 }
