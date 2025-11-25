@@ -12,7 +12,7 @@ class Client_socket : public Base_socket
 
         ssize_t fill_client_buffer();
 
-        std::vector<char> getClient_buffer();
+        std::vector<char>& getClient_buffer();
 
         bool isServer() const override { return (false); }
 };

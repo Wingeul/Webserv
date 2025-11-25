@@ -27,7 +27,7 @@ ssize_t Client_socket::fill_client_buffer()
     return (total_data);
 }
 
-std::vector<char> Client_socket::getClient_buffer()
+std::vector<char>& Client_socket::getClient_buffer()
 {
     return (this->client_buffer);
 }

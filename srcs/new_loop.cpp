@@ -36,6 +36,80 @@ int handle_server(Base_socket *sock, int epoll_fd)
     return (0);
 }
 
+void cut_vect(std::vector<char> &vect, int size)
+{
+    vect.erase(vect.begin(), vect.begin() + size);
+}
+
+std::string extract_path(std::vector<char> &vect)
+{
+    std::string ret;
+
+    size_t i = 0;
+    while (i < vect.size() && vect[i] != ' ' && vect[i] != '\n' && vect[i] != '\r')
+    {
+        ret += vect[i];
+        i++;
+    }
+    if (i>0)
+        cut_vect(vect, i + 1);
+    return (ret);
+}
+
+std::string extract_version(std::vector<char> &vect)
+{
+    size_t i = 0;
+
+    while (i<vect.size() && vect[i] != '\n')
+        i++;
+    size_t line_end = i;
+    if (i > 0 && vect[i-1] == '\r')
+        line_end = i-1;
+    std::string ret(vect.begin(), vect.begin() + line_end);
+    cut_vect(vect, i + 1);
+    return (ret);
+}
+
+bool isIdentical(std::vector<char> vect, std::string str)
+{
+    if (vect.size() < str.size())
+        return false;
+    for (int i = 0; i < str.size(); i++)
+    {
+        if(vect[i] != str[i])
+            return (false);
+    }
+    return (true);
+}
+
+int process_request(Client_socket *client)
+{
+
+    if (isIdentical(client->getClient_buffer(), "GET "))
+    {
+        cut_vect(client->getClient_buffer(), 4);
+        //apply GET
+        std::cout << "is a GET method" << std::endl;
+        return (0);
+    }
+    else if (isIdentical(client->getClient_buffer(), "POST "))
+    {
+        cut_vect(client->getClient_buffer(), 5);
+        //apply POST
+        std::cout << "is a POST method" << std::endl;
+        return (0);
+    }
+    else if (isIdentical(client->getClient_buffer(), "DELETE "))
+    {
+        cut_vect(client->getClient_buffer(), 7);
+        //apply DELETE
+        std::cout << "is a DELETE method" << std::endl;
+        return (0);
+    }
+    else
+        return (-1);
+}
+
 int handle_client(Base_socket *sock, int epoll_fd)
 {
     Client_socket* client = static_cast<Client_socket*>(sock);
@@ -44,13 +118,20 @@ int handle_client(Base_socket *sock, int epoll_fd)
 
     if (data_received <= 0)
     {
+        epoll_ctl(epoll_fd, EPOLL_CTL_DEL, client->getFd(), nullptr);
         close(client->getFd());
         delete client;
         return ((int)data_received);
     }
-    //todo process buffer
+    //this write is just for test
     std::cout.write(client->getClient_buffer().data(), client->getClient_buffer().size());
     std::cout << std::endl;
+    if (process_request(client) == -1)
+    {
+        epoll_ctl(epoll_fd, EPOLL_CTL_DEL, client->getFd(), nullptr);
+        close(client->getFd());
+        delete client;
+    }
     return (0);
 }
 

@@ -19,7 +19,7 @@ class Server_socket : public Base_socket
             if (bind(fd, (const struct sockaddr *)&(sockaddr), sizeof(sockaddr)) == -1)
                 std::cout << "failed bind" << std::endl;
             if (listen(fd, SOMAXCONN) == -1)
-                std::cout << "failed bind" << std::endl;
+                std::cout << "failed listen" << std::endl;
         };
 
         bool isServer() const override { return (true); }
