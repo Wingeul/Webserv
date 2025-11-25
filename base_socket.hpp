@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <fcntl.h>
+#include <vector>
 #include <cstring>
 #include <unistd.h>
 #include <iostream>
