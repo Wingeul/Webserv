@@ -6,7 +6,7 @@
 /*   By: jschmitz <jschmitz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/24 13:26:54 by jschmitz          #+#    #+#             */
-/*   Updated: 2025/11/25 18:08:33 by jschmitz         ###   ########.fr       */
+/*   Updated: 2025/11/26 15:35:51 by jschmitz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,13 +25,23 @@
 #include <sys/types.h> //for waitpid
 #include <sys/wait.h> //for waitpid
 
-class Request {
+class HttpRequest {
 	private:
-		char** envptr; //to avoid free in child process ?
+		//char**	envptr; //to avoid free in child process ?
+		bool	requiresCgi;
+		int		cgi_stdin_fd[2];
+		int		cgi_stdout_fd[2];
+		std::string path;
 
 	public:
-		char** getEnvp();
-		void setEnvp(char** envp);
+		//char**	getEnvp();
+		bool	getRequiresCgi();
+		int*	getCgiStdinFd();
+		int*	getCgiStdoutFd();
+		std::string getPath();
+
+		//void	setEnvp(char** envp);
+
 };
 
 #endif

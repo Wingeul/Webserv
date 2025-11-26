@@ -1,5 +1,10 @@
 #include "shebang_reader.hpp"
 
+//writing in pipe only works if big bodies are rejected (413 Payload Too Large)
+
+bool	HttpRequest::getRequiresCgi() {
+	return (this->requiresCgi);
+}
 
 //invalid CGI if script has no shebang??
 
@@ -56,69 +61,93 @@ std::vector<char *> build_args(const std::vector<std::string> &vec, const std::s
 }
 
 //add the part with the pipes??
-void run_cgi_script(const std::string &path, char* const envp[]) {
-		//test if script can be opened before ?
-		std::vector<std::string> vec;
-		std::vector<char *> args;
-		if (has_shebang(path)){
-			std::string res = interpret_shebang(path);
-			vec = split_shebang(res);
-			args = build_args(vec, path);
-		}
-		/* else {
-			//use extension or else..? Or bash?
-		} */
-		execve(vec[0].c_str(), &args[0], envp);
-		//error msg execve failed
-		exit (1);
+void run_cgi_script_in_child(int cgi_stdin_fd[2], int cgi_stdout_fd[2], \
+		const std::string &path, char* const envp[], int client_fd_in, \
+		int client_fd_out) {
+	//test if script can be opened before ?
+	std::vector<std::string> vec;
+	std::vector<char *> args;
+
+	if (dup2(cgi_stdin_fd[0], STDIN_FILENO) < 0) {
+		//throw?
+	}
+	if (dup2(cgi_stdout_fd[1], STDOUT_FILENO) < 0) {
+		//throw?
+	}
+	if (dup2(cgi_stdin_fd[1], client_fd_in) < 0) {
+		//throw?
+	}
+	if (dup2(cgi_stdout_fd[0], client_fd_out) < 0) {
+		//throw?
+	}
+	close(cgi_stdin_fd[1]);
+	close (cgi_stdout_fd[0]);
+
+	if (has_shebang(path)){
+		std::string res = interpret_shebang(path);
+		vec = split_shebang(res);
+		args = build_args(vec, path);
+	}
+	/* else {
+		//use extension or else..? Or bash?
+	} */
+	execve(vec[0].c_str(), &args[0], envp);
+	//error msg execve failed PLACEHOLDER
+	exit (1);
 }
 
-void part_to_be_integrated(const std::string &path, int cgi_stdin_fd, int cgi_stdout_fd,  char* const envp[]) {
+std::string fork_process(const std::string &path, int client_fd_in, \
+		int client_fd_out,  char* const envp[]) {
 
+	char buffer[4096];
+
+	int cgi_stdin_fd[2];
+	int cgi_stdout_fd[2];
+	//link the child and the parent though pipes
+	pipe(cgi_stdin_fd);
+	pipe(cgi_stdout_fd);
 	pid_t pid = fork();
 	if (pid == 0) { //child
-		if (dup2(cgi_stdin_fd, STDIN_FILENO) < 0) {
-			//throw
-		}
-		if (dup2(cgi_stdout_fd, STDOUT_FILENO) < 0) {
-			//throw
-		}
-		close(cgi_stdin_fd);
-		close (cgi_stdout_fd);
+		run_cgi_script_in_child(cgi_stdin_fd, cgi_stdout_fd, path, envp);
+	}
+	else { //parent
+		//close the child ends of the pipes
+		close(cgi_stdin_fd[0]);
+		close (cgi_stdout_fd[1]);
+		ssize_t bytes_read = read(client.cgi_stdout_fd)
+		//write http_req to server
 
-		run_cgi_script(path, envp);
 	}
-	else if (pid < 0) { //parent
-		close(cgi_stdin_fd);
-		close (cgi_stdout_fd);
-	}
-	else {
-		//fork failed, error?
-	}
+	close(cgi_stdout_fd[0]);
+	return(output);
 }
 
-char** create_cgi_envp(Request& http_req) {
+char** create_cgi_envp(HttpRequest& http_req) {
 	//body itself is not part of the envp
 	char** envp; //problem with freeing?
-
+	//actually creating it PLACEHOLDER
 	return (envp);
 }
 
-void parse_request(Request& http_req) {
+std::string handle_cgi(HttpRequest& http_req, T client_socket) {
 	char** envp;
 	envp = create_cgi_envp(http_req);
-	http_req.setEnvp(envp);
+	//http_req.setEnvp(envp);
+	return (fork_process(http_req.getPath(), client_socket-fdin, \
+		 client_socket-fdout, envp));
 }
 
-std::string create_answer();
+std::string serve_static(HttpRequest& http_req);
 
-const std::string request_handler(Request& http_req) {
+void request_handler(HttpRequest& http_req, T client_socket) {
 	std::string http_answer; //buffer
-	parse_request(http_req); //at this stage the request should be complete, not just chunks
-
-	http_answer = create_answer();
+	//at this stage the HttpRequest should be received completely, not just chunks
+	if (http_req.getRequiresCgi()) {
+		handle_cgi(http_req, client_socket);
+	}
+	else {
+		serve_static(http_req);
+	}
+	//send to server ??
 	return (http_answer);
 }
-
-
-//MAIN LOOP -> calling request_handler
