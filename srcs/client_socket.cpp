@@ -27,7 +27,51 @@ ssize_t Client_socket::fill_client_buffer()
     return (total_data);
 }
 
+void Client_socket::nextstate()
+{
+    switch (this->state)
+    {
+        case START_LINE:
+            this->state = HEADERS;
+            break;
+        case HEADERS:
+            this->state = BODY;
+            break;
+        case BODY:
+            this->state = COMPLETED;
+            break;
+        case COMPLETED:
+            this->state = START_LINE;
+            break;
+    }
+}
+
 std::vector<char>& Client_socket::getClient_buffer()
 {
     return (this->client_buffer);
+}
+
+Client_request& Client_socket::getClient_request()
+{
+    return (this->Client_req);
+}
+
+size_t& Client_socket::getParsed_bytes()
+{
+    return (this->parsed_bytes);
+}
+
+Client_socket::ParseState Client_socket::getState() const
+{
+    return (this->state);
+}
+
+void Client_socket::setParsed_bytes(size_t t)
+{
+    this->parsed_bytes = t;
+}
+
+void Client_socket::addToParser_bytes(size_t t)
+{
+    this->parsed_bytes+=t;
 }

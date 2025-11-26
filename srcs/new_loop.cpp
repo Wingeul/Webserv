@@ -1,5 +1,6 @@
 #include "server_socket.hpp"
 #include "client_socket.hpp"
+#include "start_line.hpp"
 
 void add_to_epoll(const int epoll_fd, Base_socket &s)
 {
@@ -36,78 +37,28 @@ int handle_server(Base_socket *sock, int epoll_fd)
     return (0);
 }
 
-void cut_vect(std::vector<char> &vect, int size)
+int parse_request(Client_socket &client)
 {
-    vect.erase(vect.begin(), vect.begin() + size);
-}
-
-std::string extract_path(std::vector<char> &vect)
-{
-    std::string ret;
-
-    size_t i = 0;
-    while (i < vect.size() && vect[i] != ' ' && vect[i] != '\n' && vect[i] != '\r')
+    int return_status = 0;
+    switch (client.getState())
     {
-        ret += vect[i];
-        i++;
+        case Client_socket::START_LINE:
+            return_status = handle_start_line(client);
+            if (return_status > -1)
+                return parse_request(client);
+            break;
+        case Client_socket::HEADERS:
+            break;
+        case Client_socket::COMPLETED:
+            /*call to handle_request
+            must finish with something like
+            cut_vect(client.getClient_buffer(), client.getParsed_bytes());
+            reset client_request in client
+            client.setParsed_bytes(0);
+            client.nextState();*/
+            break;
     }
-    if (i>0)
-        cut_vect(vect, i + 1);
-    return (ret);
-}
-
-std::string extract_version(std::vector<char> &vect)
-{
-    size_t i = 0;
-
-    while (i<vect.size() && vect[i] != '\n')
-        i++;
-    size_t line_end = i;
-    if (i > 0 && vect[i-1] == '\r')
-        line_end = i-1;
-    std::string ret(vect.begin(), vect.begin() + line_end);
-    cut_vect(vect, i + 1);
-    return (ret);
-}
-
-bool isIdentical(std::vector<char> vect, std::string str)
-{
-    if (vect.size() < str.size())
-        return false;
-    for (int i = 0; i < str.size(); i++)
-    {
-        if(vect[i] != str[i])
-            return (false);
-    }
-    return (true);
-}
-
-int process_request(Client_socket *client)
-{
-
-    if (isIdentical(client->getClient_buffer(), "GET "))
-    {
-        cut_vect(client->getClient_buffer(), 4);
-        //apply GET
-        std::cout << "is a GET method" << std::endl;
-        return (0);
-    }
-    else if (isIdentical(client->getClient_buffer(), "POST "))
-    {
-        cut_vect(client->getClient_buffer(), 5);
-        //apply POST
-        std::cout << "is a POST method" << std::endl;
-        return (0);
-    }
-    else if (isIdentical(client->getClient_buffer(), "DELETE "))
-    {
-        cut_vect(client->getClient_buffer(), 7);
-        //apply DELETE
-        std::cout << "is a DELETE method" << std::endl;
-        return (0);
-    }
-    else
-        return (-1);
+    return (return_status);
 }
 
 int handle_client(Base_socket *sock, int epoll_fd)
@@ -126,7 +77,7 @@ int handle_client(Base_socket *sock, int epoll_fd)
     //this write is just for test
     std::cout.write(client->getClient_buffer().data(), client->getClient_buffer().size());
     std::cout << std::endl;
-    if (process_request(client) == -1)
+    if (parse_request(*client) == -1)
     {
         epoll_ctl(epoll_fd, EPOLL_CTL_DEL, client->getFd(), nullptr);
         close(client->getFd());

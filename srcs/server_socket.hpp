@@ -16,6 +16,10 @@ class Server_socket : public Base_socket
             sockaddr.sin_port = htons(port);
 
             fcntl(fd, F_SETFL, O_NONBLOCK);
+            int opt = 1;
+            if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
+                perror("setsockopt");
+            }
             if (bind(fd, (const struct sockaddr *)&(sockaddr), sizeof(sockaddr)) == -1)
                 std::cout << "failed bind" << std::endl;
             if (listen(fd, SOMAXCONN) == -1)
