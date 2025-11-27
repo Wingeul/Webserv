@@ -38,6 +38,12 @@ int handle_server(Base_socket *sock, int epoll_fd)
     return (0);
 }
 
+void print_map(const std::map<std::string, std::string> &m) {
+    for (const auto &pair : m) {
+        std::cout << "'" << pair.first << "' : '" << pair.second << "'" << std::endl;
+    }
+}
+
 int parse_request(Client_socket &client)
 {
     int return_status = 0;
@@ -53,7 +59,8 @@ int parse_request(Client_socket &client)
             if (return_status > -1)
                 return parse_request(client);
             break;
-        case Client_socket::COMPLETED:
+        case Client_socket::BODY:
+            print_map(client.getClient_request().getHeaders());
             /*call to handle_request
             must finish with something like
             cut_vect(client.getClient_buffer(), client.getParsed_bytes());

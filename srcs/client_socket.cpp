@@ -51,11 +51,6 @@ std::vector<char>& Client_socket::getClient_buffer()
     return (this->client_buffer);
 }
 
-std::map<std::string, std::string>& Client_socket::getHeaders()
-{
-    return (this->headers);
-}
-
 Client_request& Client_socket::getClient_request()
 {
     return (this->Client_req);
