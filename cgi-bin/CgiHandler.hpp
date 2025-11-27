@@ -1,18 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   cgi.hpp                                            :+:      :+:    :+:   */
+/*   CgiHandler.hpp                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jschmitz <jschmitz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/11/26 20:13:18 by jschmitz          #+#    #+#             */
-/*   Updated: 2025/11/26 21:54:58 by jschmitz         ###   ########.fr       */
+/*   Created: 2025/11/27 12:15:25 by jschmitz          #+#    #+#             */
+/*   Updated: 2025/11/27 20:21:18 by jschmitz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef CGI_HPP
-#define CGI_HPP
+#ifndef CGIHANDLER_HPP
+#define CGIHANDLER_HPP
 
+#include "ClientConnection.hpp" //for now
+#include "httpResponse.hpp"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -23,17 +25,24 @@
 #include <sys/types.h> //for fork
 #include <vector>
 #include <string.h>
+#include <requestHandler.hpp>
 
 #include "../srcs/client_socket.hpp"
 
-//placeholder:
-class Client_request {
+class CgiHandler : RequestHandler {
+	private:
+		CgiHandler();
+		char** build_env(int type);
+		Client_socket& client;
+		//attributes
+
 	public:
-		std::string path;
-		std::string body;
-		int state;
-		int cgi_stdin_fd;
-		int cgi_stdout_fd;
+		CgiHandler(Client_socket& client);
+		~CgiHandler();
+		void startCgi();
+		HttpResponse createResponse(Client_socket& client);
+		void readFromCgiPipe();
+
 };
 
 #endif

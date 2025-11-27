@@ -20,6 +20,14 @@ class Client_socket : public Base_socket
         size_t parsed_bytes;
         ParseState state;
         Client_request Client_req;
+
+        //for cgi
+        int   _cgi_stdin_fd;
+        int   _cgi_stdout_fd;
+        pid_t _cgi_pid; //possible to kill process if timed out
+        std::string _cgi_output_buffer;
+        //end new stuff
+
     public:
         Client_socket(int client_fd) : Base_socket(client_fd), parsed_bytes(0), state(START_LINE) {};
 
@@ -33,10 +41,28 @@ class Client_socket : public Base_socket
         ParseState getState() const;
 
         void setParsed_bytes(size_t t);
-        
+
         void addToParser_bytes(size_t t);
 
         bool isServer() const override { return (false); }
+
+        //for cgi
+        int getCgiReadFd() const { return (_cgi_stdout_fd); }
+        int getCgiWriteFd() const { return (_cgi_stdin_fd); }
+        void attachCgi(pid_t pid, int pipe_in, int pipe_out) {
+            _cgi_pid = pid;
+            _cgi_stdin_fd = pipe_in;
+            _cgi_stdout_fd = pipe_out;
+         }
+
+        void appendCgiOutput(const char* data, size_t size) {
+            _cgi_output_buffer.append(data, size);
+        }
+
+        std::string& getCgiOutputBuffer() {
+            return (_cgi_output_buffer);
+        }
+        //end new stuff
 };
 
 #endif
