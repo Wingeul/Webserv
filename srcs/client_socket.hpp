@@ -1,6 +1,7 @@
 #ifndef CLIENT_SOCKET_HPP
 # define CLIENT_SOCKET_HPP
 
+#include <map>
 #include "base_socket.hpp"
 #include "client_request.hpp"
 
@@ -17,9 +18,11 @@ class Client_socket : public Base_socket
 
     private:
         std::vector<char> client_buffer;
+        std::map<std::string, std::string> headers;
         size_t parsed_bytes;
         ParseState state;
         Client_request Client_req;
+
     public:
         Client_socket(int client_fd) : Base_socket(client_fd), parsed_bytes(0), state(START_LINE) {};
 
@@ -28,6 +31,7 @@ class Client_socket : public Base_socket
         void nextstate();
 
         std::vector<char>& getClient_buffer();
+        std::map<std::string, std::string>& getHeaders();
         Client_request& getClient_request();
         size_t& getParsed_bytes();
         ParseState getState() const;

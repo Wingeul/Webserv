@@ -1,6 +1,7 @@
 #include "server_socket.hpp"
 #include "client_socket.hpp"
 #include "start_line.hpp"
+#include "headers.hpp"
 
 void add_to_epoll(const int epoll_fd, Base_socket &s)
 {
@@ -45,9 +46,12 @@ int parse_request(Client_socket &client)
         case Client_socket::START_LINE:
             return_status = handle_start_line(client);
             if (return_status > -1)
-                return parse_request(client);
-            break;
+                return (parse_request(client));
+            return (return_status);
         case Client_socket::HEADERS:
+            return_status = handle_headers(client);
+            if (return_status > -1)
+                return parse_request(client);
             break;
         case Client_socket::COMPLETED:
             /*call to handle_request
