@@ -3,27 +3,33 @@
 /*                                                        :::      ::::::::   */
 /*   requestHandler.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jschmitz <jschmitz@student.42.fr>          +#+  +:+       +#+        */
+/*   By: johanna <johanna@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/27 20:17:42 by jschmitz          #+#    #+#             */
-/*   Updated: 2025/11/27 20:48:21 by jschmitz         ###   ########.fr       */
+/*   Updated: 2025/11/28 00:26:58 by johanna          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef REQUESTHANDLER_HPP
 #define REQUESTHANDLER_HPP
 
+#include <iostream>
+#include "../srcs/client_socket.hpp"
+
 class RequestHandler {
 	private:
 		RequestHandler() {} //non-instantiable
-
+		~RequestHandler() {}
 
 	public:
-		~RequestHandler() {}
-		static void handleStatic(ClientConnection& client);
-		static void handleCgi(ClientConnection& client, const std::string& interpreter);
+
+		//static methods
+		static void handleStatic(Client_socket& client);
+		static void handleCgi(Client_socket& client, const std::string& interpreter);
 
 
+				HttpResponse createResponse(Client_socket& client);
+		void readFromCgiPipe();
 };
 
 #endif

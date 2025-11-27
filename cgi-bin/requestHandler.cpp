@@ -1,28 +1,26 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   cgi.cpp                                            :+:      :+:    :+:   */
+/*   requestHandler.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jschmitz <jschmitz@student.42.fr>          +#+  +:+       +#+        */
+/*   By: johanna <johanna@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/26 20:13:47 by jschmitz          #+#    #+#             */
-/*   Updated: 2025/11/27 20:00:42 by jschmitz         ###   ########.fr       */
+/*   Updated: 2025/11/28 00:23:45 by johanna          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "CgiHandler.hpp"
+#include "requestHandler.hpp"
 
 //creates the array of env variables needed for script execution
-char** CgiHandler::build_env(int type) {
+char** build_env_py() {
 	char** env;
-	if (type == 1) {
-		//build python env
-	}
+
 	return (env);
 }
 
 //the tiny pipex without waitpid
-void	CgiHandler::startCgi(Client_socket& client) {
+void	requestHandler::handleCgi(Client_socket& client, const std::string& interpreter) {
 	Client_request request = client.getClient_request();
 	int	pipe_in[2]; //local
 	int	pipe_out[2]; //local
@@ -89,7 +87,7 @@ void	CgiHandler::startCgi(Client_socket& client) {
 //send body to cgi_stdin_fd when state is CGI_WRITE_MODE (?)
 
 HttpResponse CgiHandler::createResponse(Client_socket& client) {
-	
+
 
 }
 

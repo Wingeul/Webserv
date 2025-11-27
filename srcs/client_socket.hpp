@@ -3,6 +3,7 @@
 
 #include "base_socket.hpp"
 #include "client_request.hpp"
+#include "../http-response/httpResponse.hpp"
 
 class Client_socket : public Base_socket
 {
@@ -20,6 +21,8 @@ class Client_socket : public Base_socket
         size_t parsed_bytes;
         ParseState state;
         Client_request Client_req;
+        //added
+        httpResponse http_response;
 
         //for cgi
         int   _cgi_stdin_fd;
@@ -45,7 +48,10 @@ class Client_socket : public Base_socket
         void addToParser_bytes(size_t t);
 
         bool isServer() const override { return (false); }
-
+        //new
+        HttpResponse& createHttpResponse() {
+            return (HttpResponse(_cgi_output_buffer));
+        }
         //for cgi
         int getCgiReadFd() const { return (_cgi_stdout_fd); }
         int getCgiWriteFd() const { return (_cgi_stdin_fd); }
@@ -61,6 +67,17 @@ class Client_socket : public Base_socket
 
         std::string& getCgiOutputBuffer() {
             return (_cgi_output_buffer);
+        }
+
+        void	readFromCgiPipe(void) {
+            char buf[4096];
+            ssize_t bytes_read = read(_cgi_stdout_fd, buf, 4096);
+            if (bytes_read > 0) {
+                _cgi_output_buffer.append(buf, bytes_read);
+            }
+            else if (bytes_read == 0) {
+                //EOF
+            }
         }
         //end new stuff
 };

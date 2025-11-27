@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   httpResponse.hpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jschmitz <jschmitz@student.42.fr>          +#+  +:+       +#+        */
+/*   By: johanna <johanna@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/27 12:07:40 by jschmitz          #+#    #+#             */
-/*   Updated: 2025/11/27 19:02:52 by jschmitz         ###   ########.fr       */
+/*   Updated: 2025/11/28 00:37:51 by johanna          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,9 @@ class HttpResponse {
 		std::map<std::string, std::string>	headers;
 
 		HttpResponse() : status_code(200) {}
+
+		HttpResponse(std::string _cgi_output_buffer);
+		
 		HttpResponse(const HttpResponse& src) : \
 			status_code(src.status_code) {}
 		~HttpResponse();
