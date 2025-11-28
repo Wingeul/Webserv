@@ -67,10 +67,6 @@ class Client_socket : public Base_socket
             cgi_info.cgi_stdout_fd = pipe_out;
          }
 
-        void appendCgiOutput(const char* data, size_t size) {
-            cgi_info.cgi_output_buffer.append(data, size);
-        }
-
         std::string& getCgiOutputBuffer() {
             return (cgi_info.cgi_output_buffer);
         }

@@ -6,17 +6,71 @@
 /*   By: jschmitz <jschmitz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/26 20:13:47 by jschmitz          #+#    #+#             */
-/*   Updated: 2025/11/28 18:08:52 by jschmitz         ###   ########.fr       */
+/*   Updated: 2025/11/28 19:52:47 by jschmitz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "requestHandler.hpp"
+#include <vector>
+#include <algorithm>
+
+//transform the headers into env variables for execve
+void addHeaderEnvs(std::vector<std::string>& env, \
+		const std::map<std::string, std::string>& headers) {
+
+	std::map<std::string,std::string>:: const_iterator it;
+	for (it = headers.begin(); it != headers.end(); it++) {
+		std::string key = it->first;
+		std::string value = it->second;
+		if (key == "Content-Length" || key == "Content-Type") {
+			continue;
+		}
+		std::transform(key.begin(), key.end(),key.begin(), ::toupper);
+		std::replace(key.begin(), key.end(), '-', '_');
+		std::string env_var = "HTTP_" + key + "=" + value;
+		env.push_back(env_var);
+	}
+}
+
+char** convertVectorToCharArray(std::vector<std::string> env) {
+
+	char** envp = new char*[env.size() + 1];
+
+	for (size_t i = 0; i < env.size(); i++) {
+		envp[i] = new char[env[i].size() + 1];
+		std::strcpy(envp[i], env[i].c_str());
+	}
+
+	envp[env.size()] = NULL;
+	return (envp);
+}
 
 //creates the array of env variables needed for script execution
-char** build_env() {
-	char** env;
+char** build_env(Client_request request) {
 
-	return (env);
+	std::vector<std::string> env;
+
+    env.push_back("REQUEST_METHOD=" + request.getMethod());
+    env.push_back("QUERY_STRING=" + request.getQuery());
+    env.push_back("SCRIPT_FILENAME=" + request.getPath());
+    env.push_back("CONTENT_LENGTH=" + request.getHeaders("Content-Length"));
+    env.push_back("CONTENT_TYPE=" + request.getHeaders("Content-Type"));
+
+
+    // ... add SERVER_NAME, SERVER_PORT, GATEWAY_INTERFACE ...
+
+    // 2. The PHP "Magic Key"
+    // It is safe to pass this to Python too, it will just ignore it.
+    env.push_back("REDIRECT_STATUS=200");
+
+    // 3. Convert HTTP headers (User-Agent -> HTTP_USER_AGENT)
+    // ... loop through headers ...
+
+
+	addHeaderEnvs(env, request.getHeaders());
+
+	char** envp = convertVectorToCharArray(env);
+    return (envp);
 }
 
 //the tiny pipex without waitpid
@@ -48,10 +102,11 @@ void	handleCgi(Client_socket& client) {
 			(char*)request.getPath().c_str(),
 			NULL
 		};
-		char** env_cgi = build_env(); //difference between python and php?
+		char** env_cgi = build_env(request);
 		execve(argv[0], argv, env_cgi);
 		//error msg execve failed TODO
 		perror("execve failed");
+		freeCharArray(env_cgi);
 		exit (1);
 	}
 	else if (pid > 0) {
@@ -79,11 +134,13 @@ void	handleCgi(Client_socket& client) {
 	}
 }
 
-
+//TODO
 void	requestHandler::handleStatic(Client_socket& client) {}
+
+
 
 //TODO for Paul: monitor pipe_in[1] for POLLOUT.
 //add client states: CGI_WRITING_BODY, CGI_START, CGI_READ_RESPONSE
-//send body to cgi_stdin_fd when state is CGI_WRITE_MODE (?)
+//send body to client_socket.cgi_info.cgi_stdin_fd and when state is CGI_WRITING_BODY
 
 

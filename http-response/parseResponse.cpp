@@ -6,7 +6,7 @@
 /*   By: jschmitz <jschmitz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/27 12:04:27 by jschmitz          #+#    #+#             */
-/*   Updated: 2025/11/28 18:29:08 by jschmitz         ###   ########.fr       */
+/*   Updated: 2025/11/28 18:43:46 by jschmitz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,6 @@ void parse_cgi_output(Client_socket& client) {
 			else {
 				response.addToHeader(key, value);
 			}
-
 		}
 	}
 	if (!response.findInHeader("Content-Length")) {
