@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   requestHandler.hpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: johanna <johanna@student.42.fr>            +#+  +:+       +#+        */
+/*   By: jschmitz <jschmitz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/27 20:17:42 by jschmitz          #+#    #+#             */
-/*   Updated: 2025/11/28 00:26:58 by johanna          ###   ########.fr       */
+/*   Updated: 2025/11/28 11:20:13 by jschmitz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ class RequestHandler {
 		static void handleCgi(Client_socket& client, const std::string& interpreter);
 
 
-				HttpResponse createResponse(Client_socket& client);
+		HttpResponse createResponse(Client_socket& client);
 		void readFromCgiPipe();
 };
 
