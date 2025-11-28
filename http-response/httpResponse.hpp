@@ -6,7 +6,7 @@
 /*   By: jschmitz <jschmitz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/27 12:07:40 by jschmitz          #+#    #+#             */
-/*   Updated: 2025/11/28 12:38:43 by jschmitz         ###   ########.fr       */
+/*   Updated: 2025/11/28 17:53:43 by jschmitz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,14 +15,15 @@
 
 #include <iostream>
 #include <map>
+#include <sstream>
 #include "../srcs/client_socket.hpp"
 
 class HttpResponse {
 
 	private:
-		std::string createReasonPhrase_(int status_code) const;
 		std::string	body_;
 		int	status_code_; //for example 200, 404, 500
+		std::string status_msg_;
 		std::map<std::string, std::string>	headers_;
 
 	public:
@@ -32,7 +33,19 @@ class HttpResponse {
 		~HttpResponse();
 		HttpResponse& operator=(const HttpResponse& src);
 
-		void setHeader(const std::string& key, const std::string& value);
+		//setters
+		void setStatusCode(int status_code);
+		void setStatusMessage(std::string message);
+		void setBody(std::string body);
+
+		//getters
+		std::string getBody();
+
+		//member functions
+		void addToHeader(const std::string& key, const std::string& value);
+		bool findInHeader(const std::string& key);
+		std::string	sizeHeader();
+
 		std::string serialize() const;
 };
 

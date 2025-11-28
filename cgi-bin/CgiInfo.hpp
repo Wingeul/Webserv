@@ -1,20 +1,22 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parseResponse.hpp                                  :+:      :+:    :+:   */
+/*   CgiInfo.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jschmitz <jschmitz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/11/27 12:04:55 by jschmitz          #+#    #+#             */
-/*   Updated: 2025/11/27 19:02:10 by jschmitz         ###   ########.fr       */
+/*   Created: 2025/11/28 18:21:35 by jschmitz          #+#    #+#             */
+/*   Updated: 2025/11/28 18:24:17 by jschmitz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PARSERESPONSE_HPP
-#define PARSERESPONSE_HPP
-
 #include <iostream>
 
-#include "../srcs/client_socket.hpp"
+struct CgiInfo {
+	pid_t		pid; //possible to kill process if timed out
+	int			cgi_stdin_fd;  // server -> cgi
+	int			cgi_stdout_fd; // cgi -> server
+	std::string	cgi_output_buffer;
 
-#endif
+	CgiInfo() : pid(-1), cgi_stdin_fd(-1), cgi_stdout_fd(-1) {}
+};

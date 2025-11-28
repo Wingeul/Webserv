@@ -6,7 +6,7 @@
 /*   By: jschmitz <jschmitz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/28 11:54:28 by jschmitz          #+#    #+#             */
-/*   Updated: 2025/11/28 12:40:51 by jschmitz         ###   ########.fr       */
+/*   Updated: 2025/11/28 17:23:36 by jschmitz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,17 +31,22 @@ HttpResponse& HttpResponse::operator=(const HttpResponse& src) {
 	return (*this);
 }
 
-//MEMBER FUNCTIONS
-
-
-std::string HttpResponse::createReasonPhrase_(int status_code) const {
-	std::string reason;
-	//
-	return (reason);
+//SETTERS
+void HttpResponse::setStatusCode(int status_code) {
+	this->status_code_ = status_code;
 }
 
+void HttpResponse::setStatusMessage(std::string message) {
+	this->status_msg_ = message;
+}
 
-void HttpResponse::setHeader(const std::string& key, const std::string& value) {
+void HttpResponse::setBody(std::string body) {
+	this->body_ = body;
+}
+
+//MEMBER FUNCTIONS
+
+void HttpResponse::addToHeader(const std::string& key, const std::string& value) {
 	headers_[key] = value;
 }
 

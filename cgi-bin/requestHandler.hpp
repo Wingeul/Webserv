@@ -6,7 +6,7 @@
 /*   By: jschmitz <jschmitz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/27 20:17:42 by jschmitz          #+#    #+#             */
-/*   Updated: 2025/11/28 12:48:00 by jschmitz         ###   ########.fr       */
+/*   Updated: 2025/11/28 18:03:56 by jschmitz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,9 +24,9 @@ class RequestHandler {
 	public:
 		//static methods
 		static void handleStatic(Client_socket& client);
-		static void handleCgi(Client_socket& client, const std::string& interpreter);
+		static void handleCgi(Client_socket& client);
 
-		void createHttpResponse(Client_socket& client);
+		static void createHttpResponse(Client_socket& client);
 		void readFromCgiPipe();
 };
 
