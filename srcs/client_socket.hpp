@@ -4,6 +4,7 @@
 #include "base_socket.hpp"
 #include "client_request.hpp"
 #include "../http-response/httpResponse.hpp"
+#include "../cgi-bin/CgiInfo.hpp"
 
 class Client_socket : public Base_socket
 {
@@ -13,7 +14,11 @@ class Client_socket : public Base_socket
             START_LINE,
             HEADERS,
             BODY,
-            COMPLETED
+            COMPLETED,
+            CGI_WRITING_BODY,
+            CGI_START,
+            CGI_READ_RESPONSE,
+            PARSE_CGI_RESPONSE
         };
 
     private:
@@ -22,14 +27,8 @@ class Client_socket : public Base_socket
         ParseState state;
         Client_request Client_req;
         //added
-        httpResponse http_response;
-
-        //for cgi
-        int   _cgi_stdin_fd;
-        int   _cgi_stdout_fd;
-        pid_t _cgi_pid; //possible to kill process if timed out
-        std::string _cgi_output_buffer;
-        //end new stuff
+        HttpResponse http_response;
+        CgiInfo cgi_info;
 
     public:
         Client_socket(int client_fd) : Base_socket(client_fd), parsed_bytes(0), state(START_LINE) {};
@@ -41,7 +40,7 @@ class Client_socket : public Base_socket
         std::vector<char>& getClient_buffer();
         Client_request& getClient_request();
         size_t& getParsed_bytes();
-        ParseState getState() const;
+        ParseState& getState() const;
 
         void setParsed_bytes(size_t t);
 
@@ -49,35 +48,31 @@ class Client_socket : public Base_socket
 
         bool isServer() const override { return (false); }
         //new
-        HttpResponse& createHttpResponse() {
-            return (HttpResponse(_cgi_output_buffer));
+        HttpResponse& getHttpResponse() {
+            return (http_response);
         }
+
+        void setState(ParseState new_state) {
+            state = new_state;
+        }
+
         //for cgi
-        int getCgiReadFd() const { return (_cgi_stdout_fd); }
-        int getCgiWriteFd() const { return (_cgi_stdin_fd); }
+        CgiInfo& getCgiInfo() {
+            return (cgi_info);
+        }
+
         void attachCgi(pid_t pid, int pipe_in, int pipe_out) {
-            _cgi_pid = pid;
-            _cgi_stdin_fd = pipe_in;
-            _cgi_stdout_fd = pipe_out;
+            cgi_info.pid = pid;
+            cgi_info.cgi_stdin_fd = pipe_in;
+            cgi_info.cgi_stdout_fd = pipe_out;
          }
 
         void appendCgiOutput(const char* data, size_t size) {
-            _cgi_output_buffer.append(data, size);
+            cgi_info.cgi_output_buffer.append(data, size);
         }
 
         std::string& getCgiOutputBuffer() {
-            return (_cgi_output_buffer);
-        }
-
-        void	readFromCgiPipe(void) {
-            char buf[4096];
-            ssize_t bytes_read = read(_cgi_stdout_fd, buf, 4096);
-            if (bytes_read > 0) {
-                _cgi_output_buffer.append(buf, bytes_read);
-            }
-            else if (bytes_read == 0) {
-                //EOF
-            }
+            return (cgi_info.cgi_output_buffer);
         }
         //end new stuff
 };
