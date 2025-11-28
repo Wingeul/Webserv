@@ -46,25 +46,21 @@ int parse_request(Client_socket &client)
     switch (client.getState())
     {
         case Client_socket::START_LINE:
-            std::cout << "start" << std::endl;
             return_status = handle_start_line(client);
             if (return_status > -1)
                 return (parse_request(client));
             return (return_status);
         case Client_socket::HEADERS:
-            std::cout << "header" << std::endl;
             return_status = handle_headers(client);
             if (return_status > -1)
                 return parse_request(client);
             return (return_status);
         case Client_socket::BODY:
-            std::cout << "body" << std::endl;
             return_status = handle_body(client);
             if (return_status > -1)
                 return parse_request(client);
             return (return_status);
         case Client_socket::COMPLETED:
-            std::cout << "completed" << std::endl;
             return (handle_request(client));
     }
     return (return_status);
