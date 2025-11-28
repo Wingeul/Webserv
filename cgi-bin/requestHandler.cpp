@@ -6,7 +6,7 @@
 /*   By: jschmitz <jschmitz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/26 20:13:47 by jschmitz          #+#    #+#             */
-/*   Updated: 2025/11/28 19:52:47 by jschmitz         ###   ########.fr       */
+/*   Updated: 2025/11/28 20:37:19 by jschmitz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,19 +55,12 @@ char** build_env(Client_request request) {
     env.push_back("SCRIPT_FILENAME=" + request.getPath());
     env.push_back("CONTENT_LENGTH=" + request.getHeaders("Content-Length"));
     env.push_back("CONTENT_TYPE=" + request.getHeaders("Content-Type"));
+	//still missing some
 
-
-    // ... add SERVER_NAME, SERVER_PORT, GATEWAY_INTERFACE ...
-
-    // 2. The PHP "Magic Key"
-    // It is safe to pass this to Python too, it will just ignore it.
+	//important for PHP
     env.push_back("REDIRECT_STATUS=200");
 
-    // 3. Convert HTTP headers (User-Agent -> HTTP_USER_AGENT)
-    // ... loop through headers ...
-
-
-	addHeaderEnvs(env, request.getHeaders());
+   	addHeaderEnvs(env, request.getHeaders());
 
 	char** envp = convertVectorToCharArray(env);
     return (envp);
