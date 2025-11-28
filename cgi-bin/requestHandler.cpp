@@ -3,17 +3,23 @@
 /*                                                        :::      ::::::::   */
 /*   requestHandler.cpp                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: johanna <johanna@student.42.fr>            +#+  +:+       +#+        */
+/*   By: jschmitz <jschmitz@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/26 20:13:47 by jschmitz          #+#    #+#             */
-/*   Updated: 2025/11/28 00:23:45 by johanna          ###   ########.fr       */
+/*   Updated: 2025/11/28 13:12:33 by jschmitz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "requestHandler.hpp"
 
 //creates the array of env variables needed for script execution
-char** build_env_py() {
+char** build_env_python() {
+	char** env;
+
+	return (env);
+}
+
+char** build_env_php() {
 	char** env;
 
 	return (env);
@@ -82,12 +88,10 @@ void	requestHandler::handleCgi(Client_socket& client, const std::string& interpr
 }
 
 
+void	requestHandler::handleStatic(Client_socket& client) {}
+
 //TODO for Paul: monitor pipe_in[1] for POLLOUT.
 //add client states: CGI_WRITING_BODY, CGI_START, CGI_READ_RESPONSE
 //send body to cgi_stdin_fd when state is CGI_WRITE_MODE (?)
 
-HttpResponse CgiHandler::createResponse(Client_socket& client) {
-
-
-}
 
