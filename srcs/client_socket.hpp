@@ -34,8 +34,10 @@ class Client_socket : public Base_socket
         ParseState getState() const;
 
         void setParsed_bytes(size_t t);
-        
+
         void addToParser_bytes(size_t t);
+
+        void reset();
 
         bool isServer() const override { return (false); }
 };

@@ -46,6 +46,14 @@ void Client_socket::nextstate()
     }
 }
 
+void Client_socket::reset()
+{
+    this->client_buffer.erase(this->client_buffer.begin(), this->client_buffer.begin() + this->parsed_bytes);
+    this->parsed_bytes = 0;
+    this->state = START_LINE;
+    this->Client_req.reset();
+}
+
 std::vector<char>& Client_socket::getClient_buffer()
 {
     return (this->client_buffer);

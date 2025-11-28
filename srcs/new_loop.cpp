@@ -3,6 +3,7 @@
 #include "start_line.hpp"
 #include "headers.hpp"
 #include "body.hpp"
+#include "handle_request.hpp"
 
 void add_to_epoll(const int epoll_fd, Base_socket &s)
 {
@@ -39,41 +40,32 @@ int handle_server(Base_socket *sock, int epoll_fd)
     return (0);
 }
 
-/*void print_map(const std::map<std::string, std::string> &m) {
-    for (const auto &pair : m) {
-        std::cout << "'" << pair.first << "' : '" << pair.second << "'" << std::endl;
-    }
-}*/
-
 int parse_request(Client_socket &client)
 {
     int return_status = 0;
     switch (client.getState())
     {
         case Client_socket::START_LINE:
+            std::cout << "start" << std::endl;
             return_status = handle_start_line(client);
             if (return_status > -1)
                 return (parse_request(client));
             return (return_status);
         case Client_socket::HEADERS:
+            std::cout << "header" << std::endl;
             return_status = handle_headers(client);
             if (return_status > -1)
                 return parse_request(client);
             return (return_status);
         case Client_socket::BODY:
+            std::cout << "body" << std::endl;
             return_status = handle_body(client);
-            return (0);
             if (return_status > -1)
                 return parse_request(client);
             return (return_status);
         case Client_socket::COMPLETED:
-            /*call to handle_request
-            must finish with something like
-            cut_vect(client.getClient_buffer(), client.getParsed_bytes());
-            reset client_request in client
-            client.setParsed_bytes(0);
-            client.nextState();*/
-            break;
+            std::cout << "completed" << std::endl;
+            return (handle_request(client));
     }
     return (return_status);
 }
@@ -91,9 +83,6 @@ int handle_client(Base_socket *sock, int epoll_fd)
         delete client;
         return ((int)data_received);
     }
-    //this write is just for test
-    std::cout.write(client->getClient_buffer().data(), client->getClient_buffer().size());
-    std::cout << std::endl;
     if (parse_request(*client) == -1)
     {
         epoll_ctl(epoll_fd, EPOLL_CTL_DEL, client->getFd(), nullptr);

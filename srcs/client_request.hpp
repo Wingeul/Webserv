@@ -28,6 +28,16 @@ class Client_request
         void setPath(std::string str){this->path = str;};
         void setVersion(std::string str){this->version = str;};
         void setBody(std::string str){this->body = str;};
+
+        void reset()
+        {
+            this->method = "";
+            this->path = "";
+            this->version = "";
+            this->headers.clear();
+            this->body = "";
+        };
+
 };
 
 #endif
