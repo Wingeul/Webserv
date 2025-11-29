@@ -8,19 +8,22 @@
 #include <fcntl.h>
 #include <vector>
 #include <cstring>
+#include <stdlib.h>
 #include <unistd.h>
 #include <iostream>
+#include <cerrno>
+#include <cstddef>
 
 class Base_socket {
     protected:
         int fd;
+        bool isServer;
     public:
-        Base_socket(int fd) : fd(fd) {}
+        Base_socket(int fd, bool server) : fd(fd), isServer(server) {}
         virtual ~Base_socket() { if (fd >= 0) close(fd); }
 
         int getFd() const { return fd; }
-
-        virtual bool isServer() const = 0;
+        bool getIsServer() const { return isServer; }
 };
 
 

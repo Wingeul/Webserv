@@ -22,7 +22,7 @@ class Client_socket : public Base_socket
         Client_request Client_req;
 
     public:
-        Client_socket(int client_fd) : Base_socket(client_fd), parsed_bytes(0), state(START_LINE) {};
+        Client_socket(int client_fd) : Base_socket(client_fd, false), parsed_bytes(0), state(START_LINE) {};
 
         ssize_t fill_client_buffer();
 
@@ -38,8 +38,6 @@ class Client_socket : public Base_socket
         void addToParser_bytes(size_t t);
 
         void reset();
-
-        bool isServer() const override { return (false); }
 };
 
 #endif

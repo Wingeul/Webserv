@@ -7,7 +7,8 @@
 
 void add_to_epoll(const int epoll_fd, Base_socket &s)
 {
-    struct epoll_event ev{};
+    struct epoll_event ev;
+    std::memset(&ev, 0, sizeof(ev));
     ev.events = EPOLLIN;
     ev.data.ptr = &s;
 
@@ -24,12 +25,14 @@ int handle_server(Base_socket *sock, int epoll_fd)
     
     while(true)
     {
-        int client_fd = accept(server->getFd(), nullptr, nullptr);
+        int client_fd = accept(server->getFd(), NULL, NULL);
         if (client_fd == -1)
+        {
             if (errno == EAGAIN || errno == EWOULDBLOCK)
                 break;
             else
                 return -1;
+        }
         if (client_fd >= 0)
         {
             fcntl(client_fd, F_SETFL, O_NONBLOCK);
@@ -74,14 +77,14 @@ int handle_client(Base_socket *sock, int epoll_fd)
 
     if (data_received <= 0)
     {
-        epoll_ctl(epoll_fd, EPOLL_CTL_DEL, client->getFd(), nullptr);
+        epoll_ctl(epoll_fd, EPOLL_CTL_DEL, client->getFd(), NULL);
         close(client->getFd());
         delete client;
         return ((int)data_received);
     }
     if (parse_request(*client) == -1)
     {
-        epoll_ctl(epoll_fd, EPOLL_CTL_DEL, client->getFd(), nullptr);
+        epoll_ctl(epoll_fd, EPOLL_CTL_DEL, client->getFd(), NULL);
         close(client->getFd());
         delete client;
     }
@@ -112,7 +115,7 @@ void loop()
         {
             Base_socket* sock = static_cast<Base_socket*>(events[i].data.ptr);
 
-            if (sock->isServer())
+            if (sock->getIsServer())
             {
                 if (handle_server(sock, epoll_fd) == -1)
                     break;

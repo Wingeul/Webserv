@@ -6,7 +6,7 @@
 class Server_socket : public Base_socket
 {
     public:
-        Server_socket(const int port) : Base_socket(socket(AF_INET, SOCK_STREAM, 0))
+        Server_socket(const int port) : Base_socket(socket(AF_INET, SOCK_STREAM, 0), (true))
         {
             struct sockaddr_in sockaddr;
 
@@ -18,7 +18,7 @@ class Server_socket : public Base_socket
             fcntl(fd, F_SETFL, O_NONBLOCK);
             int opt = 1;
             if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
-                perror("setsockopt");
+                std::cout << "failed sockopt" << std::endl;;
             }
             if (bind(fd, (const struct sockaddr *)&(sockaddr), sizeof(sockaddr)) == -1)
                 std::cout << "failed bind" << std::endl;
@@ -26,7 +26,6 @@ class Server_socket : public Base_socket
                 std::cout << "failed listen" << std::endl;
         };
 
-        bool isServer() const override { return (true); }
 };
 
 #endif
