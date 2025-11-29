@@ -1,4 +1,4 @@
-#include "headers.hpp"
+#include "../../includes/request_parsing/headers.hpp"
 
 int has_full_headers(Client_socket &client)
 {

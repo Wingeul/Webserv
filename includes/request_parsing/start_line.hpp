@@ -2,8 +2,8 @@
 # define START_LINE_HPP
 
 #include <algorithm>
-#include "client_socket.hpp"
-#include "utils.hpp"
+#include "../client_side/client_socket.hpp"
+#include "../utils/utils.hpp"
 
 int has_full_start_line(Client_socket &client);
 int extract_path(Client_socket &client);

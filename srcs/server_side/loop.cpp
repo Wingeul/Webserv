@@ -1,9 +1,9 @@
-#include "server_socket.hpp"
-#include "client_socket.hpp"
-#include "start_line.hpp"
-#include "headers.hpp"
-#include "body.hpp"
-#include "handle_request.hpp"
+#include "../../includes/server_side/server_socket.hpp"
+#include "../../includes/server_side/handle_request.hpp"
+#include "../../includes/client_side/client_socket.hpp"
+#include "../../includes/request_parsing/start_line.hpp"
+#include "../../includes/request_parsing/headers.hpp"
+#include "../../includes/request_parsing/body.hpp"
 
 void add_to_epoll(const int epoll_fd, Base_socket &s)
 {

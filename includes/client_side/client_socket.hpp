@@ -1,7 +1,7 @@
 #ifndef CLIENT_SOCKET_HPP
 # define CLIENT_SOCKET_HPP
 
-#include "base_socket.hpp"
+#include "../server_side/base_socket.hpp"
 #include "client_request.hpp"
 
 class Client_socket : public Base_socket

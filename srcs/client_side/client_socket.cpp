@@ -1,4 +1,4 @@
-#include "client_socket.hpp"
+#include "../../includes/client_side/client_socket.hpp"
 
 ssize_t Client_socket::fill_client_buffer()
 {
