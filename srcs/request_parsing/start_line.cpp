@@ -1,4 +1,4 @@
-#include "start_line.hpp"
+#include "../../includes/request_parsing/start_line.hpp"
 
 int extract_path(Client_socket &client)
 {
@@ -58,8 +58,19 @@ int extract_method(Client_socket &client)
         return (-1);
 }
 
+int has_full_start_line(Client_socket &client)
+{
+    if (std::find(client.getClient_buffer().begin(), client.getClient_buffer().end(), '\n') != client.getClient_buffer().end())
+    {
+        return (0);
+    }
+    return (-2);
+}
+
 int handle_start_line(Client_socket &client)
 {
+    if (has_full_start_line(client) == -2)
+        return (-2);
     if (extract_method(client) == -1)
         return (-1);
     if (extract_path(client) == -1)

@@ -1,4 +1,4 @@
-#include "client_socket.hpp"
+#include "../../includes/client_side/client_socket.hpp"
 
 ssize_t Client_socket::fill_client_buffer()
 {
@@ -44,6 +44,14 @@ void Client_socket::nextstate()
             this->state = START_LINE;
             break;
     }
+}
+
+void Client_socket::reset()
+{
+    this->client_buffer.erase(this->client_buffer.begin(), this->client_buffer.begin() + this->parsed_bytes);
+    this->parsed_bytes = 0;
+    this->state = START_LINE;
+    this->Client_req.reset();
 }
 
 std::vector<char>& Client_socket::getClient_buffer()
